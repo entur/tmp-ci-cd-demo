@@ -5,7 +5,6 @@ common:
   ingress:
     trafficType: public
   container:
-    image: ${artifact.metadata.image}
     cpu: "0.006"
     memory: 78
     envFrom:

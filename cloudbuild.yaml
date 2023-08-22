@@ -1,25 +1,63 @@
 # TODO: only build and tf plan for PR
-substitutions:
-  _ENV: kub-ent-sbx
-  _CLOUDSDK_COMPUTE_ZONE: europe-west1-b
-  _CLOUDSDK_CONTAINER_CLUSTER: ${_ENV}-001
 options:
   dynamic_substitutions: true  
   logging: CLOUD_LOGGING_ONLY
+  env:
+    - DOCKER_BUILDKIT=1
+
+substitutions:
+  _IMAGE_NAME: getting-started
+  # _IMAGE_VERSION: '$BRANCH_NAME.$SHORT_SHA'
+  _IMAGE_VERSION: $SHORT_SHA
+  _ENV_NAME: sbx
+  _ENV: kub-ent-${_ENV_NAME}
+  _CLOUDSDK_COMPUTE_ZONE: europe-west1-b
+  _CLOUDSDK_CONTAINER_CLUSTER: ${_ENV}-001
+
+  _REGISTRY: europe-west1-docker.pkg.dev
+  _REPOSITORY: ${_IMAGE_NAME}
+  _PROJECT: $PROJECT_ID
+  _IMAGE: ${_REGISTRY}/${_PROJECT}/${_REPOSITORY}/${_IMAGE_NAME}
+
+tags:
+  - build
+  - ${_IMAGE_NAME}
+
+timeout: 3660s
+
+images:
+  # - ${_REGISTRY}/${_PROJECT}/${_IMAGE_NAME}
+  - ${_REGISTRY}/${_PROJECT}/${_REPOSITORY}/${_IMAGE_NAME}
+
+# availableSecrets:
+#   secretManager:
+#     - versionName: projects/${_PROJECT}/secrets/SECRET_NAME/versions/latest
+#       env: 'SECRET_NAME'
+
 steps:
   # TODO: Run unit tests if not part of docker build
 
-  - id: 'build image'
+  - id: build-getstarted
     name: 'gcr.io/cloud-builders/docker'
+  # secretEnv:
+  #  - SECRET_NAME
     args:
       - 'build'
-      - '-t'
-      - 'eu.gcr.io/entur-system-1287/$REPO_NAME/$BRANCH_NAME:$SHORT_SHA'
+      - '--tag=${_IMAGE}:latest'
+      - '--tag=${_IMAGE}:${_ENV_NAME}'
+      - '--tag=${_IMAGE}:${_IMAGE_VERSION}'
+      - --build-arg=BUILDKIT_INLINE_CACHE=1
+      - --cache-from=${_IMAGE}:latest
+      - --cache-from=${_IMAGE}:${_IMAGE_VERSION}
+      - --cache-from=${_IMAGE}:dev
+      - --cache-from=${_IMAGE}:tst
+      - --cache-from=${_IMAGE}:prd
       - '.'
+    timeout: 3600s
 
-  - id: 'push image'
+  - id: push-getstarted
     name: 'gcr.io/cloud-builders/docker'
-    args: ['push', 'eu.gcr.io/entur-system-1287/$REPO_NAME/$BRANCH_NAME:$SHORT_SHA']
+    args: ['push', '${_IMAGE}:${_IMAGE_VERSION}']
 
   # Install helm dependencies, no more `./charts` and `.tgz` archive
   - name: 'eu.gcr.io/entur-system-1287/helm'
@@ -37,6 +75,7 @@ steps:
       - '--namespace'
       - 'getting-started'
       - 'getting-started'
+      - '--set common.container.image=${_IMAGE}:${_IMAGE_VERSION}'
       - '-f'
       - 'helm/getting-started/env/values-${_ENV}.yaml'
       - 'helm/getting-started'
