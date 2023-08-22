@@ -45,7 +45,7 @@ steps:
     - 'CLOUDSDK_CONTAINER_CLUSTER=${_CLOUDSDK_CONTAINER_CLUSTER}'
 
   # Apply terraform changes
-  - name: 'hashicorp/terraform: 1.1.0'
+  - name: 'hashicorp/terraform:1.1.0'
     entrypoint: 'sh'
     args:
       - '-c'
