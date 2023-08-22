@@ -5,6 +5,7 @@ substitutions:
   _CLOUDSDK_CONTAINER_CLUSTER: ${_ENV}-001
 options:
   dynamic_substitutions: true  
+  logging: CLOUD_LOGGING_ONLY
 steps:
   # TODO: Run unit tests if not part of docker build
 
