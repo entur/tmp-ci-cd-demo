@@ -3,6 +3,14 @@
 This is an internal experiment for Team Plattform.
 Feel free to browse, but you will not learn anything useful here. :boom:
 
+## Highlights
+
+* Per app, per env least privilege (run cloud build with `application` or with a new `ci` SA)
+* No longer needs `./helm/$repo/charts` and the bundled `common-$verison.tgz`
+* Easily handle `kubernetes` `firebase` `cloud function` `cloud run` deployment types
+* Clean arch for "no cluster cron" with Cloud Scheduler -> Cloud Build
+
+
 ## Tweaks needed
 
 Some work needs to be done to play with Cloud Build as a first class citizen.
