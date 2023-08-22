@@ -16,8 +16,7 @@ substitutions:
 
   _REGISTRY: europe-west1-docker.pkg.dev
   _REPOSITORY: ${_IMAGE_NAME}
-  _PROJECT: $PROJECT_ID
-  _IMAGE: ${_REGISTRY}/${_PROJECT}/${_REPOSITORY}/${_IMAGE_NAME}
+  _IMAGE: ${_REGISTRY}/${PROJECT_ID}/${_REPOSITORY}/${_IMAGE_NAME}
 
 tags:
   - build
@@ -26,12 +25,12 @@ tags:
 timeout: 3660s
 
 images:
-  # - ${_REGISTRY}/${_PROJECT}/${_IMAGE_NAME}
-  - ${_REGISTRY}/${_PROJECT}/${_REPOSITORY}/${_IMAGE_NAME}
+  # - ${_REGISTRY}/${PROJECT_ID}/${_IMAGE_NAME}
+  - ${_REGISTRY}/${PROJECT_ID}/${_REPOSITORY}/${_IMAGE_NAME}
 
 # availableSecrets:
 #   secretManager:
-#     - versionName: projects/${_PROJECT}/secrets/SECRET_NAME/versions/latest
+#     - versionName: projects/${PROJECT_ID}/secrets/SECRET_NAME/versions/latest
 #       env: 'SECRET_NAME'
 
 steps:
