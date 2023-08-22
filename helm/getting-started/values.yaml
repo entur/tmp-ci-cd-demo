@@ -1,0 +1,21 @@
+common:
+  app: getting-started
+  shortname: getstarted
+  team: plattform
+  ingress:
+    trafficType: public
+  container:
+    image: ${artifact.metadata.image}
+    cpu: "0.006"
+    memory: 78
+    envFrom:
+      - configMapRef:
+          name: getting-started-rocketlaunch-bucket
+    probes:
+      liveness:
+        path: "/health/alive"
+      readiness:
+        path: "/health/ready"
+    prometheus:
+      enabled: true
+      path: "/metrics"

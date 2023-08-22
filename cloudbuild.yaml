@@ -1,0 +1,65 @@
+# TODO: only build and tf plan for PR
+substitutions:
+  _ENV: kub-ent-sbx
+  _CLOUDSDK_COMPUTE_ZONE: europe-west1-b
+  _CLOUDSDK_CONTAINER_CLUSTER: ${_ENV}-001
+options:
+  dynamic_substitutions: true  
+steps:
+  # TODO: Run unit tests if not part of docker build
+
+  - id: 'build image'
+    name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/$REPO_NAME/$BRANCH_NAME:$SHORT_SHA'
+      - '.'
+
+  - id: 'push image'
+    name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/$PROJECT_ID/$REPO_NAME/$BRANCH_NAME:$SHORT_SHA']
+
+  # Install helm dependencies, no more `./charts` and `.tgz` archive
+  - name: 'eu.gcr.io/entur-system-1287/helm'
+    args: 
+      - 'dependency'
+      - 'update'
+      - 'helm/getting-started'
+
+  # Render Helm template
+  - name: 'eu.gcr.io/entur-system-1287/helm'
+    args: 
+      - 'template'
+      - '--output-dir'
+      - 'chart'
+      - '--namespace'
+      - 'getting-started'
+      - 'getting-started'
+      - '-f'
+      - 'helm/getting-started/env/values-${_ENV}.yaml'
+      - 'helm/getting-started'
+    env:
+    - 'CLOUDSDK_COMPUTE_ZONE=${_CLOUDSDK_COMPUTE_ZONE}'
+    - 'CLOUDSDK_CONTAINER_CLUSTER=${_CLOUDSDK_CONTAINER_CLUSTER}'
+
+  # Apply terraform changes
+  - name: 'hashicorp/terraform: 1.1.0'
+    entrypoint: 'sh'
+    args:
+      - '-c'
+      - |
+        terraform init
+        terraform validate
+        terraform plan --var-file=env/${_ENV}.tfvars -out terraform.plan
+        terraform apply --auto-approve terraform.plan
+
+  - name: 'gcr.io/cloud-builders/kubectl'
+    args: ['apply', '-k', 'chart']
+    env:
+    - 'CLOUDSDK_COMPUTE_ZONE=${_CLOUDSDK_COMPUTE_ZONE}'
+    - 'CLOUDSDK_CONTAINER_CLUSTER=${_CLOUDSDK_CONTAINER_CLUSTER}'
+
+  # TODO: smoke tests?
+  # TODO: sync apigee
+  # TODO: publish developer docs
