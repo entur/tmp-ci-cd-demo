@@ -59,14 +59,16 @@ steps:
     args: ['push', '${_IMAGE}:${_IMAGE_VERSION}']
 
   # Install helm dependencies, no more `./charts` and `.tgz` archive
-  - name: 'eu.gcr.io/entur-system-1287/helm'
+  - id: helm-deps
+    name: '${_REGISTRY}/${PROJECT_ID}/helm/helm:latest'
     args: 
       - 'dependency'
       - 'update'
       - 'helm/getting-started'
 
   # Render Helm template
-  - name: 'eu.gcr.io/entur-system-1287/helm'
+  - id: helm-template
+    name: '${_REGISTRY}/${PROJECT_ID}/helm/helm:latest'
     args: 
       - 'template'
       - '--output-dir'

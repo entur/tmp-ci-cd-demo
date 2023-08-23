@@ -16,6 +16,12 @@ Feel free to browse, but you will not learn anything useful here. :boom:
 Some work needs to be done to play with Cloud Build as a first class citizen.
 Below is a list of things that needed doing as part of a demo for Entur.
 
+### Preconditions
+
+- [ ] Existing repo in AR
+- [ ] Able to access `helm` cloud builder (see below)
+  - gcloud auth configure-docker europe-west1-docker.pkg.dev
+
 ### Build a cloud builder for helm
 
 - [ ] Build https://github.com/GoogleCloudPlatform/cloud-builders-community/tree/master/helm
