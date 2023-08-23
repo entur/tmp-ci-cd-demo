@@ -107,14 +107,19 @@ steps:
       - 'CLOUDSDK_CORE_PROJECT=${_CLOUDSDK_CORE_PROJECT}'
 
   - id: generate-kubeconfig
-    name: gcr.io/cloud-builders/gke-deploy
+    name: gcr.io/cloud-builders/gcloud
     args:
-      - prepare
-      - '--help'
-      - '--cluster=${_CLOUDSDK_CONTAINER_CLUSTER}'
-      - '--project=${_CLOUDSDK_CORE_PROJECT}'
-      - '--location=${_CLOUDSDK_COMPUTE_REGION}'
-      - '--namespace=${_NAMESPACE}'
+      - gcloud
+      - container
+      - clusters
+      - get-credentials
+      - ${_CLOUDSDK_CONTAINER_CLUSTER}
+      - --region
+      - ${_CLOUDSDK_COMPUTE_REGION}
+      - --project
+      - ${_CLOUDSDK_CORE_PROJECT}
+    env:
+      - 'KUBECONFIG=/workspace/.kube/config'
 
   - id: 'Terraform init & plan'
     name: 'hashicorp/terraform:1.1.0'
@@ -126,6 +131,8 @@ steps:
         terraform init && \
         terraform workspace select ${_ENV} && \
         terraform plan --var-file=env/${_ENV}.tfvars -out /workspace/tf_settings.tfplan
+    env:
+      - 'KUBE_CONFIG_PATHS=/workspace/.kube/config'
 
   - id: 'Terraform apply'
     name: 'hashicorp/terraform:1.1.0'
@@ -136,6 +143,8 @@ steps:
         cd terraform && \
         terraform workspace select ${_ENV} && \
         terraform apply -auto-approve "/workspace/tf_settings.tfplan"
+    env:
+      - 'KUBE_CONFIG_PATHS=/workspace/.kube/config'
 
   - id: Deploy
     name: gcr.io/cloud-builders/gke-deploy
