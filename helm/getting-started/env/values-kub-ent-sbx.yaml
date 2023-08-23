@@ -6,6 +6,8 @@ common:
     env:
       - name: GCP_PROJECT
         value: ent-getstarted-sbx
+      - name: BUCKET_NAME
+        value: ent-gcs-rocketlaunch-sbx-001
   configmap:
     enabled: true
     toEnv: true
