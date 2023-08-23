@@ -71,12 +71,12 @@ steps:
       - '.'
     timeout: 3600s
 
-  - id: build-getstarted
+  - id: push-getstarted
     name: 'gcr.io/cloud-builders/docker'
     args:
       - 'push'
       - '-a'
-      - '--tag=${_IMAGE}:latest'
+      - '--tag=${_IMAGE}:${COMMIT_SHA}'
 
   # Install helm dependencies, no more `./charts` and `.tgz` archive
   - id: helm-deps
