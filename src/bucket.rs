@@ -29,10 +29,13 @@ pub async fn get_bucket_object(obj: String) -> Result<String> {
             &Range::default(),
         )
         .await;
-    if let Ok(data) = data {
-        if let Ok(utf) = String::from_utf8(data) {
-            return Ok(utf);
+    match data {
+        Ok(data) => {
+            if let Ok(utf) = String::from_utf8(data) {
+                return Ok(utf);
+            }
         }
+        Err(e) => println!("{:?}", e),
     }
     Err(reject::custom(Error::ReadFile(obj)))
 }
