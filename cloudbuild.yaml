@@ -1,6 +1,6 @@
 # TODO: only build and tf plan for PR
 options:
-  dynamic_substitutions: true  
+  dynamic_substitutions: true
   substitutionOption: ALLOW_LOOSE
   env:
     - DOCKER_BUILDKIT=1
@@ -35,7 +35,7 @@ images:
 availableSecrets:
   secretManager:
     - versionName: projects/$PROJECT_NUMBER/secrets/slack-${_ENV}-slack-url/versions/latest
-      env: 'SLACK_URL' 
+      env: 'SLACK_URL'
 
 steps:
   - name: gcr.io/cloud-builders/gcloud
@@ -81,7 +81,7 @@ steps:
   # Install helm dependencies, no more `./charts` and `.tgz` archive
   - id: helm-deps
     name: 'alpine/helm'
-    args: 
+    args:
       - 'dependency'
       - 'update'
       - '/workspace/helm/getting-started'
@@ -93,7 +93,7 @@ steps:
   # Render Helm template
   - id: helm-template
     name: 'alpine/helm'
-    args: 
+    args:
       - 'template'
       - '--output-dir'
       - '/workspace/chart'
@@ -130,7 +130,8 @@ steps:
     args:
       - '-c'
       - |
-        cd terraform && \
+        go install k8s.io/client-go@latest && \
+        cd /workspace/terraform && \
         terraform init && \
         terraform workspace select ${_ENV} && \
         terraform plan --var-file=env/${_ENV}.tfvars -out /workspace/tf_settings.tfplan
@@ -143,7 +144,7 @@ steps:
     args:
       - '-c'
       - |
-        cd terraform && \
+        cd /workspace/terraform && \
         terraform workspace select ${_ENV} && \
         terraform apply -auto-approve "/workspace/tf_settings.tfplan"
     env:

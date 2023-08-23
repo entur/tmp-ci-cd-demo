@@ -14,7 +14,7 @@ module "cloud-storage" {
   force_destroy               = true  # nothing to keep in the bucket
   versioning                  = false # no need for versioning
   generation                  = 1     # generation #number 001
-  create_kubernetes_resources = false
+  create_kubernetes_resources = true
   # lifecycle_rules_override = [
   #   {
   #     action = {
