@@ -23,6 +23,7 @@ Add SLACK_URL to SM with terraform?
 - [ ] Existing repo in AR
 - [ ] Able to access `helm` cloud builder (see below)
   - gcloud auth configure-docker europe-west1-docker.pkg.dev
+- [ ] Access to TF statefile
 
 ### Build a cloud builder for helm
 

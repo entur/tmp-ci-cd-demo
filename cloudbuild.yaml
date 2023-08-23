@@ -88,7 +88,7 @@ steps:
 
   # Render Helm template
   - id: helm-template
-    name: '${_REGISTRY}/${PROJECT_ID}/helm/helm:latest'
+    name: 'alpine/helm'
     args: 
       - 'template'
       - '--output-dir'
