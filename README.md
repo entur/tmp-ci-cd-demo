@@ -46,6 +46,7 @@ GCLOUD_PROJECT=ent-kub-sbx
 - [ ] Kubernetes Engine Developer (cleanup)
 - [ ] Storage Admin in ent-tfapps-shr-001 (cleanup)
 - [ ] Owner
+- [ ] Compute Network Viewer in ent-networks-shr-sbx-something (cleanup)
 
 ### App factory changes
 

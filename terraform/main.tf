@@ -7,13 +7,14 @@ module "init" {
 
 # Create a GCS bucket using the Entur cloud-storage module
 module "cloud-storage" {
-  source                 = "github.com/entur/terraform-google-cloud-storage//modules/bucket?ref=v0.2.0"
-  init                   = module.init
-  name_override          = "rocketlaunch"
-  disable_offsite_backup = true  # not needed for this example
-  force_destroy          = true  # nothing to keep in the bucket
-  versioning             = false # no need for versioning
-  generation             = 1     # generation #number 001
+  source                      = "github.com/entur/terraform-google-cloud-storage//modules/bucket?ref=v0.2.0"
+  init                        = module.init
+  name_override               = "rocketlaunch"
+  disable_offsite_backup      = true  # not needed for this example
+  force_destroy               = true  # nothing to keep in the bucket
+  versioning                  = false # no need for versioning
+  generation                  = 1     # generation #number 001
+  create_kubernetes_resources = false
   # lifecycle_rules_override = [
   #   {
   #     action = {
@@ -74,14 +75,14 @@ resource "random_password" "password" {
     # Generate new password when we switch this number
     secret_id = 1
   }
-  
+
   length           = 16
   special          = true
   override_special = "!#$%&*()-_=+[]{}<>:?"
-  }
+}
 
 # add secret version
 resource "google_secret_manager_secret_version" "rocket_secret_version_001" {
-  secret = google_secret_manager_secret.rocket_secret_001.id
+  secret      = google_secret_manager_secret.rocket_secret_001.id
   secret_data = random_password.password.result
 }
