@@ -23,8 +23,8 @@ RUN cargo clippy  --target=x86_64-unknown-linux-musl --all-features -- --deny=wa
     # reduce size by stripping debug symbols \
     strip /app/target/x86_64-unknown-linux-musl/release/rocket && \
     # gid/pid over 10k is best practice \
-    groupadd -g 10101 appgroup && \
-    useradd -u 10100 -g 10101 appuser
+    groupadd -g 10100 appgroup && \
+    useradd -u 10100 -g 10100 appuser
 
 # scratch is an empty image
 FROM scratch
@@ -32,7 +32,7 @@ FROM scratch
 COPY --from=builder /etc/passwd /etc/passwd
 COPY --from=builder /etc/group /etc/group
 # Switch to non-root user
-USER 10100:10101
+USER 10100:10100
 # Copy the binary from the builder image
 COPY --from=builder /app/target/x86_64-unknown-linux-musl/release/rocket /rocket
 # open port 8080
