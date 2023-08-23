@@ -65,6 +65,9 @@ steps:
       - 'dependency'
       - 'update'
       - 'helm/getting-started'
+    env:
+      - 'CLOUDSDK_COMPUTE_ZONE=${_CLOUDSDK_COMPUTE_ZONE}'
+      - 'CLOUDSDK_CONTAINER_CLUSTER=${_CLOUDSDK_CONTAINER_CLUSTER}'
 
   # Render Helm template
   - id: helm-template
@@ -81,8 +84,8 @@ steps:
       - 'helm/getting-started/env/values-${_ENV}.yaml'
       - 'helm/getting-started'
     env:
-    - 'CLOUDSDK_COMPUTE_ZONE=${_CLOUDSDK_COMPUTE_ZONE}'
-    - 'CLOUDSDK_CONTAINER_CLUSTER=${_CLOUDSDK_CONTAINER_CLUSTER}'
+      - 'CLOUDSDK_COMPUTE_ZONE=${_CLOUDSDK_COMPUTE_ZONE}'
+      - 'CLOUDSDK_CONTAINER_CLUSTER=${_CLOUDSDK_CONTAINER_CLUSTER}'
 
   # Apply terraform changes
   - name: 'hashicorp/terraform:1.1.0'
