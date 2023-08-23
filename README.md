@@ -18,6 +18,8 @@ Below is a list of things that needed doing as part of a demo for Entur.
 
 Add SLACK_URL to SM with terraform?
 
+Resource Manager API
+
 ### Preconditions
 
 - [ ] Existing repo in AR
@@ -42,6 +44,8 @@ GCLOUD_PROJECT=ent-kub-sbx
 - [ ] artifactregistry.repositories.uploadArtifacts
   - [ ] Cloud Build Service Account
 - [ ] Kubernetes Engine Developer (cleanup)
+- [ ] Storage Admin in ent-tfapps-shr-001 (cleanup)
+- [ ] Owner
 
 ### App factory changes
 

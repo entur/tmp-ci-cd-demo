@@ -106,6 +106,16 @@ steps:
       - 'CLOUDSDK_CONTAINER_CLUSTER=${_CLOUDSDK_CONTAINER_CLUSTER}'
       - 'CLOUDSDK_CORE_PROJECT=${_CLOUDSDK_CORE_PROJECT}'
 
+  - id: generate-kubeconfig
+    name: gcr.io/cloud-builders/gke-deploy
+    args:
+      - prepare
+      - '--help'
+      - '--cluster=${_CLOUDSDK_CONTAINER_CLUSTER}'
+      - '--project=${_CLOUDSDK_CORE_PROJECT}'
+      - '--location=${_CLOUDSDK_COMPUTE_REGION}'
+      - '--namespace=${_NAMESPACE}'
+
   - id: 'Terraform init & plan'
     name: 'hashicorp/terraform:1.1.0'
     entrypoint: 'sh'
