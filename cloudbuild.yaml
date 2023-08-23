@@ -82,7 +82,7 @@ steps:
     args: 
       - 'dependency'
       - 'update'
-      - 'helm/getting-started'
+      - '/workspace/helm/getting-started'
     env:
       - 'CLOUDSDK_COMPUTE_REGION=${_CLOUDSDK_COMPUTE_REGION}'
       - 'CLOUDSDK_CONTAINER_CLUSTER=${_CLOUDSDK_CONTAINER_CLUSTER}'
@@ -101,8 +101,8 @@ steps:
       - '--set'
       - 'common.container.image=${_IMAGE}:${_IMAGE_VERSION}'
       - '-f'
-      - 'helm/getting-started/env/values-${_ENV}.yaml'
-      - 'helm/getting-started'
+      - '/workspace/helm/getting-started/env/values-${_ENV}.yaml'
+      - '/workspace/helm/getting-started'
     env:
       - 'CLOUDSDK_COMPUTE_REGION=${_CLOUDSDK_COMPUTE_REGION}'
       - 'CLOUDSDK_CONTAINER_CLUSTER=${_CLOUDSDK_CONTAINER_CLUSTER}'
