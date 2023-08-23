@@ -2,8 +2,6 @@ FROM rust:1.71.1 as builder
 ENV USER root
 
 WORKDIR /app
-COPY ./Cargo.* ./
-COPY ./src ./src
 
 RUN apt-get update && \
     # pre-reqs for for rustup openssl \
@@ -13,7 +11,9 @@ RUN apt-get update && \
     # add clippy
     rustup component add clippy
     
-RUN ls -la
+COPY ./Cargo.* ./
+COPY ./src ./src
+
 # Cache point for docker build
 RUN cargo clippy  --target=x86_64-unknown-linux-musl --all-features -- --deny=warnings && \
     # run unit tests
