@@ -13,6 +13,7 @@ substitutions:
   _ENV: kub-ent-${_ENV_NAME}
   _CLOUDSDK_COMPUTE_ZONE: europe-west1-b
   _CLOUDSDK_CONTAINER_CLUSTER: ${_ENV}-001
+  _CLOUDSDK_CORE_PROJECT: ent-kub-sbx
 
   _REGISTRY: europe-west1-docker.pkg.dev
   _REPOSITORY: ${_IMAGE_NAME}
@@ -68,6 +69,7 @@ steps:
     env:
       - 'CLOUDSDK_COMPUTE_ZONE=${_CLOUDSDK_COMPUTE_ZONE}'
       - 'CLOUDSDK_CONTAINER_CLUSTER=${_CLOUDSDK_CONTAINER_CLUSTER}'
+      - 'CLOUDSDK_CORE_PROJECT=${_CLOUDSDK_CORE_PROJECT}'
 
   # Render Helm template
   - id: helm-template
@@ -86,6 +88,7 @@ steps:
     env:
       - 'CLOUDSDK_COMPUTE_ZONE=${_CLOUDSDK_COMPUTE_ZONE}'
       - 'CLOUDSDK_CONTAINER_CLUSTER=${_CLOUDSDK_CONTAINER_CLUSTER}'
+      - 'CLOUDSDK_CORE_PROJECT=${_CLOUDSDK_CORE_PROJECT}'
 
   # Apply terraform changes
   - name: 'hashicorp/terraform:1.1.0'
