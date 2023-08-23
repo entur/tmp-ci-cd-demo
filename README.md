@@ -30,6 +30,8 @@ GCLOUD_PROJECT=ent-kub-sbx
 ### IAM changes
 
 - [ ] roles/logging.logWriter for `application`
+- [ ] artifactregistry.repositories.uploadArtifacts
+  - [ ] Cloud Build Service Account
 
 ### App factory changes
 
