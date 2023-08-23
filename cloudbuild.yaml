@@ -76,7 +76,7 @@ steps:
     args:
       - 'push'
       - '-a'
-      - '${_IMAGE}:${COMMIT_SHA}'
+      - '${_IMAGE}'
 
   # Install helm dependencies, no more `./charts` and `.tgz` archive
   - id: helm-deps
