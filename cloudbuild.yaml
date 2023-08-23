@@ -76,7 +76,7 @@ steps:
 
   # Install helm dependencies, no more `./charts` and `.tgz` archive
   - id: helm-deps
-    name: '${_REGISTRY}/${PROJECT_ID}/helm/helm:latest'
+    name: 'alpine/helm'
     args: 
       - 'dependency'
       - 'update'
