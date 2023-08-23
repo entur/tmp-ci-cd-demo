@@ -109,7 +109,6 @@ steps:
   - id: generate-kubeconfig
     name: gcr.io/cloud-builders/gcloud
     args:
-      - gcloud
       - container
       - clusters
       - get-credentials
