@@ -16,6 +16,8 @@ Feel free to browse, but you will not learn anything useful here. :boom:
 Some work needs to be done to play with Cloud Build as a first class citizen.
 Below is a list of things that needed doing as part of a demo for Entur.
 
+Add SLACK_URL to SM with terraform?
+
 ### Preconditions
 
 - [ ] Existing repo in AR
@@ -38,6 +40,7 @@ GCLOUD_PROJECT=ent-kub-sbx
 - [ ] roles/logging.logWriter for `application`
 - [ ] artifactregistry.repositories.uploadArtifacts
   - [ ] Cloud Build Service Account
+- [ ] Kubernetes Engine Developer (cleanup)
 
 ### App factory changes
 

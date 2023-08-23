@@ -1,17 +1,18 @@
 # TODO: only build and tf plan for PR
 options:
   dynamic_substitutions: true  
-  logging: CLOUD_LOGGING_ONLY
+  substitutionOption: ALLOW_LOOSE
   env:
     - DOCKER_BUILDKIT=1
 
 substitutions:
   _IMAGE_NAME: getting-started
+  _NAMESPACE: ${_IMAGE_NAME}
   # _IMAGE_VERSION: '$BRANCH_NAME.$SHORT_SHA'
   _IMAGE_VERSION: $SHORT_SHA
   _ENV_NAME: sbx
   _ENV: kub-ent-${_ENV_NAME}
-  _CLOUDSDK_COMPUTE_ZONE: europe-west1-b
+  _CLOUDSDK_COMPUTE_REGION: europe-west1
   _CLOUDSDK_CONTAINER_CLUSTER: ${_ENV}-001
   _CLOUDSDK_CORE_PROJECT: ent-kub-sbx
 
@@ -25,16 +26,34 @@ tags:
 
 timeout: 3660s
 
+logsBucket: 'gs://${PROJECT_ID}-cloudbuild/${REPO_NAME}/${BRANCH_NAME}'
+
+# TODO: why images?
 images:
   # - ${_REGISTRY}/${PROJECT_ID}/${_IMAGE_NAME}
   - ${_REGISTRY}/${PROJECT_ID}/${_REPOSITORY}/${_IMAGE_NAME}
 
-# availableSecrets:
-#   secretManager:
-#     - versionName: projects/${PROJECT_ID}/secrets/SECRET_NAME/versions/latest
-#       env: 'SECRET_NAME'
+availableSecrets:
+  secretManager:
+    - versionName: projects/$PROJECT_NUMBER/secrets/slack-${_ENV}-slack-url/versions/latest
+      env: 'SLACK_URL' 
 
 steps:
+  - name: gcr.io/cloud-builders/gcloud
+    id: Send start msg
+    entrypoint: "bash"
+    secretEnv: ['SLACK_URL']
+    allowFailure: true
+    args:
+      - "-c"
+      - |
+        RESPONSE=$(curl -i -X POST -H 'Content-type: application/json' --data \
+        '{"channel":"team-zzz","type":"mrkdwn",
+        "text":"*getting-started* - $_ENV : Build commit $SHORT_SHA <$_LOGURL|[View Log]>"}' \
+        $$SLACK_URL| \
+        grep HTTP | cut -d' ' -f2)
+        if [ "200" != "$$RESPONSE" ]; then exit 1; fi
+
   # TODO: Run unit tests if not part of docker build
 
   - id: build-getstarted
@@ -46,6 +65,7 @@ steps:
       - '--tag=${_IMAGE}:latest'
       - '--tag=${_IMAGE}:${_ENV_NAME}'
       - '--tag=${_IMAGE}:${_IMAGE_VERSION}'
+      - '--tag=${_IMAGE}:${COMMIT_SHA}'
       - --build-arg=BUILDKIT_INLINE_CACHE=1
       - --cache-from=${_IMAGE}:latest
       - --cache-from=${_IMAGE}:${_IMAGE_VERSION}
@@ -55,9 +75,6 @@ steps:
       - '.'
     timeout: 3600s
 
-  - id: push-getstarted
-    name: 'gcr.io/cloud-builders/docker'
-    args: ['push', '${_IMAGE}:${_IMAGE_VERSION}']
 
   # Install helm dependencies, no more `./charts` and `.tgz` archive
   - id: helm-deps
@@ -67,7 +84,7 @@ steps:
       - 'update'
       - 'helm/getting-started'
     env:
-      - 'CLOUDSDK_COMPUTE_ZONE=${_CLOUDSDK_COMPUTE_ZONE}'
+      - 'CLOUDSDK_COMPUTE_REGION=${_CLOUDSDK_COMPUTE_REGION}'
       - 'CLOUDSDK_CONTAINER_CLUSTER=${_CLOUDSDK_CONTAINER_CLUSTER}'
       - 'CLOUDSDK_CORE_PROJECT=${_CLOUDSDK_CORE_PROJECT}'
 
@@ -77,35 +94,49 @@ steps:
     args: 
       - 'template'
       - '--output-dir'
-      - 'chart'
+      - '/workspace/chart'
       - '--namespace'
-      - 'getting-started'
+      - '${_NAMESPACE}'
       - 'getting-started'
       - '--set common.container.image=${_IMAGE}:${_IMAGE_VERSION}'
       - '-f'
       - 'helm/getting-started/env/values-${_ENV}.yaml'
       - 'helm/getting-started'
     env:
-      - 'CLOUDSDK_COMPUTE_ZONE=${_CLOUDSDK_COMPUTE_ZONE}'
+      - 'CLOUDSDK_COMPUTE_REGION=${_CLOUDSDK_COMPUTE_REGION}'
       - 'CLOUDSDK_CONTAINER_CLUSTER=${_CLOUDSDK_CONTAINER_CLUSTER}'
       - 'CLOUDSDK_CORE_PROJECT=${_CLOUDSDK_CORE_PROJECT}'
 
-  # Apply terraform changes
-  - name: 'hashicorp/terraform:1.1.0'
+  - id: 'Terraform init & plan'
+    name: 'hashicorp/terraform:1.1.0'
     entrypoint: 'sh'
     args:
       - '-c'
       - |
-        terraform init
-        terraform validate
-        terraform plan --var-file=env/${_ENV}.tfvars -out terraform.plan
-        terraform apply --auto-approve terraform.plan
+        cd terraform && \
+        terraform init && \
+        terraform plan --var-file=env/${_ENV}.tfvars -out /workspace/tf_settings.tfplan
 
-  - name: 'gcr.io/cloud-builders/kubectl'
-    args: ['apply', '-k', 'chart']
-    env:
-    - 'CLOUDSDK_COMPUTE_ZONE=${_CLOUDSDK_COMPUTE_ZONE}'
-    - 'CLOUDSDK_CONTAINER_CLUSTER=${_CLOUDSDK_CONTAINER_CLUSTER}'
+  - id: 'Terraform apply'
+    name: 'hashicorp/terraform:1.1.0'
+    entrypoint: 'sh'
+    args:
+      - '-c'
+      - |
+        cd terraform && \
+        terraform apply -auto-approve "/workspace/tf_settings.tfplan"
+
+  - id: Deploy
+    name: gcr.io/cloud-builders/gke-deploy
+    args:
+      - apply
+      - '--recursive'
+      - '--filename=/workspace/chart'
+      - '--cluster=${_CLOUDSDK_CONTAINER_CLUSTER}'
+      - '--project=${_CLOUDSDK_CORE_PROJECT}'
+      - '--location=${_CLOUDSDK_COMPUTE_REGION}'
+      - '--namespace=${_NAMESPACE}'
+
 
   # TODO: smoke tests?
   # TODO: sync apigee
