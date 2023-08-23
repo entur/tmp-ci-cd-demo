@@ -10,8 +10,7 @@ substitutions:
   _NAMESPACE: ${_IMAGE_NAME}
   # _IMAGE_VERSION: '$BRANCH_NAME.$SHORT_SHA'
   _IMAGE_VERSION: $SHORT_SHA
-  _ENV_NAME: sbx
-  _ENV: kub-ent-${_ENV_NAME}
+  _ENV: kub-ent-sbx
   _CLOUDSDK_COMPUTE_REGION: europe-west1
   _CLOUDSDK_CONTAINER_CLUSTER: ${_ENV}-001
   _CLOUDSDK_CORE_PROJECT: ent-kub-sbx
@@ -63,7 +62,6 @@ steps:
     args:
       - 'build'
       - '--tag=${_IMAGE}:latest'
-      - '--tag=${_IMAGE}:${_ENV_NAME}'
       - '--tag=${_IMAGE}:${_IMAGE_VERSION}'
       - '--tag=${_IMAGE}:${COMMIT_SHA}'
       - --build-arg=BUILDKIT_INLINE_CACHE=1
@@ -116,6 +114,7 @@ steps:
       - |
         cd terraform && \
         terraform init && \
+        terraform workspace select ${_ENV} && \
         terraform plan --var-file=env/${_ENV}.tfvars -out /workspace/tf_settings.tfplan
 
   - id: 'Terraform apply'
@@ -125,6 +124,7 @@ steps:
       - '-c'
       - |
         cd terraform && \
+        terraform workspace select ${_ENV} && \
         terraform apply -auto-approve "/workspace/tf_settings.tfplan"
 
   - id: Deploy
