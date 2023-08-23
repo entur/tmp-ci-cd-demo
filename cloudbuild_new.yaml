@@ -1,0 +1,151 @@
+# Schema: https://cloud.google.com/build/docs/build-config-file-schema
+
+# TODO: only build and tf plan for PR
+options:
+  dynamic_substitutions: true
+  substitutionOption: ALLOW_LOOSE
+  logging: CLOUD_LOGGING_ONLY
+  env:
+    - DOCKER_BUILDKIT=1
+  # workerpool (if needed)
+  #  workerPool: 'projects/${PROJECT_ID}/locations/${_REGION}/workerPools/cloudbuild-worker-pool-${_ENV}'
+
+substitutions:
+  _IMAGE_NAME: getting-started
+  # _IMAGE_VERSION: '$BRANCH_NAME.$SHORT_SHA'
+  _IMAGE_VERSION: $SHORT_SHA
+  _ENV_NAME: sbx
+  _ENV: kub-ent-${_ENV_NAME}
+  _CLOUDSDK_COMPUTE_ZONE: europe-west1-b
+  _CLOUDSDK_CONTAINER_CLUSTER: ${_ENV}-001
+
+  _REGISTRY: europe-west1-docker.pkg.dev
+  _REPOSITORY: ${_IMAGE_NAME}
+  _IMAGE: ${_REGISTRY}/${PROJECT_ID}/${_REPOSITORY}/${_IMAGE_NAME}
+
+tags:
+  - build
+  - ${_IMAGE_NAME}
+
+timeout: 3660s
+# common bucket for logs (and artifacts)
+logsBucket: 'gs://${PROJECT_ID}-cloudbuild/${REPO_NAME}/${BRANCH_NAME}'
+
+# secrets
+availableSecrets:
+  secretManager:
+    - versionName: projects/$PROJECT_NUMBER/secrets/slack-${_ENV}-slack-url/versions/latest
+      env: 'SLACK_URL'  # sets the secret key to a variable
+
+
+images:
+  # - ${_REGISTRY}/${PROJECT_ID}/${_IMAGE_NAME}
+  - ${_REGISTRY}/${PROJECT_ID}/${_REPOSITORY}/${_IMAGE_NAME}
+
+steps:
+  - name: gcr.io/cloud-builders/gcloud
+    id: Send start msg
+    entrypoint: "bash"
+    secretEnv: ['SLACK_URL']
+    allowFailure: true
+    args:
+      - "-c"
+      - |
+        RESPONSE=$(curl -i -X POST -H 'Content-type: application/json' --data \
+        '{"channel":"team-zzz","type":"mrkdwn",
+        "text":"*getting-started* - $_ENV : Build commit $SHORT_SHA <$_LOGURL|[View Log]>"}' \
+        $$SLACK_URL| \
+        grep HTTP | cut -d' ' -f2)
+        if [ "200" != "$$RESPONSE" ]; then exit 1; fi
+  # TODO: Run unit tests if not part of docker build
+
+  - id: build-getstarted
+    name: 'gcr.io/cloud-builders/docker'
+  # secretEnv:
+  #  - SECRET_NAME
+    args:
+      - 'build'
+      - '--tag=${_IMAGE}:latest'
+      - '--tag=${_IMAGE}:${_ENV_NAME}'
+      - '--tag=${_IMAGE}:${_IMAGE_VERSION}'
+      - '--tag=${_IMAGE}:${COMMIT_SHA}'
+      - --build-arg=BUILDKIT_INLINE_CACHE=1
+      - --cache-from=${_IMAGE}:latest
+      - --cache-from=${_IMAGE}:${_IMAGE_VERSION}
+      - --cache-from=${_IMAGE}:dev
+      - --cache-from=${_IMAGE}:tst
+      - --cache-from=${_IMAGE}:prd
+      - '.'
+    timeout: 3600s
+
+  - id: push-getstarted
+    name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - '-a'
+      - '${_IMAGE}:${_IMAGE_VERSION}'
+
+  # Install helm dependencies, no more `./charts` and `.tgz` archive
+  - name: 'eu.gcr.io/entur-system-1287/helm'
+    args:
+      - 'dependency'
+      - 'update'
+      - 'helm/getting-started'
+
+  # Render Helm template
+  - name: 'eu.gcr.io/entur-system-1287/helm'
+    args:
+      - 'template'
+      - '--output-dir'
+      - 'chart'
+      - '--namespace'
+      - 'getting-started'
+      - 'getting-started'
+      - '--set common.container.image=${_IMAGE}:${_IMAGE_VERSION}'
+      - '-f'
+      - 'helm/getting-started/env/values-${_ENV}.yaml'
+      - 'helm/getting-started'
+    env:
+    - 'CLOUDSDK_COMPUTE_ZONE=${_CLOUDSDK_COMPUTE_ZONE}'
+    - 'CLOUDSDK_CONTAINER_CLUSTER=${_CLOUDSDK_CONTAINER_CLUSTER}'
+
+  # TERRAFORM
+  - id: 'Terraform init & plan'
+    name: 'hashicorp/terraform:1.0.0'
+    entrypoint: 'sh'
+    args:
+      - '-c'
+      - |
+        cd terraform && \
+        terraform init && \
+        terraform plan -out=/workspace/tf_settings.tfplan
+  - id: 'Terraform apply'
+    name: 'hashicorp/terraform:1.0.0'
+    entrypoint: 'sh'
+    args:
+      - '-c'
+      - |
+        cd terraform && \
+        ls
+        terraform apply -auto-approve "/workspace/tf_settings.tfplan"
+  # / TERRAFORM
+  # DEPLOY TO KUBERNETES
+  - id: Deploy
+    name: gcr.io/cloud-builders/gke-deploy
+    args:
+      - apply
+      - '--recursive'
+      - '--filename=xxyyzz.yaml'
+      - '--cluster=$_GKE_CLUSTER'
+      - '--location=$_GKE_LOCATION'
+      - '--namespace=$_NAMESPACE'
+
+  - name: 'gcr.io/cloud-builders/kubectl'
+    args: ['apply', '-k', 'chart']
+    env:
+    - 'CLOUDSDK_COMPUTE_ZONE=${_CLOUDSDK_COMPUTE_ZONE}'
+    - 'CLOUDSDK_CONTAINER_CLUSTER=${_CLOUDSDK_CONTAINER_CLUSTER}'
+
+  # TODO: smoke tests?
+  # TODO: sync apigee
+  # TODO: publish developer docs
