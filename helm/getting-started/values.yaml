@@ -7,9 +7,6 @@ common:
   container:
     cpu: "0.006"
     memory: 78
-    envFrom:
-      - configMapRef:
-          name: getting-started-rocketlaunch-bucket
     probes:
       liveness:
         path: "/health/alive"

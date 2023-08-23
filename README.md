@@ -20,6 +20,8 @@ Add SLACK_URL to SM with terraform?
 
 Resource Manager API
 
+TF needs go-client auth plugin
+
 ### Preconditions
 
 - [ ] Existing repo in AR

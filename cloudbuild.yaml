@@ -57,8 +57,6 @@ steps:
 
   - id: build-getstarted
     name: 'gcr.io/cloud-builders/docker'
-  # secretEnv:
-  #  - SECRET_NAME
     args:
       - 'build'
       - '--tag=${_IMAGE}:latest'
@@ -73,6 +71,12 @@ steps:
       - '.'
     timeout: 3600s
 
+  - id: build-getstarted
+    name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - '-a'
+      - '--tag=${_IMAGE}:latest'
 
   # Install helm dependencies, no more `./charts` and `.tgz` archive
   - id: helm-deps
