@@ -125,30 +125,37 @@ steps:
       - 'KUBECONFIG=/workspace/.kube/config'
 
   - id: 'Terraform init & plan'
-    name: 'hashicorp/terraform:1.1.0'
-    entrypoint: 'sh'
+    name: 'gcr.io/cloud-builders/gke-deploy'
+    entrypoint: 'bash'
     args:
       - '-c'
       - |
-        go install k8s.io/client-go@latest && \
+        git clone --depth 1 https://github.com/asdf-vm/asdf.git /workspace/.asdf && \
+        chmod +x /workspace/.asdf/asdf.sh /workspace/.asdf/completions/asdf.bash && \
+        . /workspace/.asdf/asdf.sh && \
+        asdf plugin add terraform && \
         cd /workspace/terraform && \
+        asdf install && \
         terraform init && \
         terraform workspace select ${_ENV} && \
         terraform plan --var-file=env/${_ENV}.tfvars -out /workspace/tf_settings.tfplan
     env:
       - 'KUBE_CONFIG_PATHS=/workspace/.kube/config'
+      - 'ASDF_DATA_DIR=/workspace/.asdf/data'
 
   - id: 'Terraform apply'
-    name: 'hashicorp/terraform:1.1.0'
-    entrypoint: 'sh'
+    name: 'gcr.io/cloud-builders/gke-deploy'
+    entrypoint: 'bash'
     args:
       - '-c'
       - |
+        . /workspace/.asdf/asdf.sh && \
         cd /workspace/terraform && \
         terraform workspace select ${_ENV} && \
         terraform apply -auto-approve "/workspace/tf_settings.tfplan"
     env:
       - 'KUBE_CONFIG_PATHS=/workspace/.kube/config'
+      - 'ASDF_DATA_DIR=/workspace/.asdf/data'
 
   - id: Deploy
     name: gcr.io/cloud-builders/gke-deploy
