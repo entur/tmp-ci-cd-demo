@@ -1,0 +1,15 @@
+name: Continous Deployment
+
+on:
+  pull_request:
+    branches:
+      - master
+      - main
+    types:
+      - closed
+
+jobs:
+  golden-ci:
+    uses: entur/tmp-github-actions-2/workflows/golden-ci-rust.yml@master
+    secrets:
+      token: ${{ secrets.GITHUB_TOKEN }}
