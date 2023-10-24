@@ -13,6 +13,8 @@ on:
 jobs:
   tf-plan:
     uses: entur/tmp-github-actions-2/.github/workflows/tf-plan.yml@master
+    with: 
+      TERRAFORM_VERSION: 1.1.0
   golden-ci:
     uses: entur/tmp-github-actions-2/.github/workflows/golden-ci-rust.yml@master
     # secrets:
