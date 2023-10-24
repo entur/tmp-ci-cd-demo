@@ -13,5 +13,5 @@ on:
 jobs:
   golden-ci:
     uses: entur/tmp-github-actions-2/.github/workflows/golden-ci-rust.yml@master
-    secrets:
-      token: ${{ secrets.GITHUB_TOKEN }}
+    # secrets:
+    #   token: ${{ secrets.GITHUB_TOKEN }}
