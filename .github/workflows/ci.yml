@@ -11,6 +11,8 @@ on:
       - edited
 
 jobs:
+  tf-plan:
+    uses: entur/tmp-github-actions-2/.github/workflows/tf-plan.yml@master
   golden-ci:
     uses: entur/tmp-github-actions-2/.github/workflows/golden-ci-rust.yml@master
     # secrets:
