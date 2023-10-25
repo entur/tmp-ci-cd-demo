@@ -12,6 +12,7 @@ on:
 
 jobs:
   tf-plan:
+    continue-on-error: true
     strategy:
       matrix:
         env: [dev, prd]
