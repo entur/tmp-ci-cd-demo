@@ -12,7 +12,8 @@ on:
 
 jobs:
   tf-plan:
-    continue-on-error: true
+    name: Terraform plan
+    secrets: inherit
     strategy:
       matrix:
         env: [dev, prd]
@@ -20,4 +21,3 @@ jobs:
     with:
       tf_version: 1.1.0
       environment: ${{ matrix.env }}
-    secrets: inherit
