@@ -16,6 +16,7 @@ jobs:
     with:
       tf_version: 1.1.0
       environment: dev
+    secrets: inherit
   golden-ci:
     uses: entur/tmp-github-actions-2/.github/workflows/golden-ci-rust.yml@master
     # secrets:
