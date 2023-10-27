@@ -9,14 +9,19 @@ on:
       - closed
 
 jobs:
-  tf-plan:
-    name: Terraform plan
-    secrets: inherit
-    strategy:
-      fail-fast: false
-      matrix:
-        env: [dev, prd]
+  tf-apply-dev:
+    name: Terraform apply
     uses: entur/tmp-github-actions-2/.github/workflows/tf-apply.yml@master
     with:
       tf_version: 1.1.0
-      environment: ${{ matrix.env }}
+      environment: dev
+    secrets: inherit
+
+  tf-apply-prd:
+    name: Terraform apply
+    uses: entur/tmp-github-actions-2/.github/workflows/tf-apply.yml@master
+    with:
+      tf_version: 1.1.0
+      environment: prd
+    secrets: inherit
+    needs: [tf-apply-dev]
