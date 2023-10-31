@@ -5,8 +5,8 @@
   ingress:
     trafficType: public
   container:
-    cpu: "0.006"
-    memory: 78
+    cpu: 0.2
+    memory: 256
     probes:
       liveness:
         path: "/greet"
