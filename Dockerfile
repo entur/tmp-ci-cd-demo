@@ -5,7 +5,7 @@ FROM gcr.io/distroless/java21-debian12:nonroot
 EXPOSE 8080
 
 WORKDIR /app
-COPY build/libs/rest-example-0.0.1-SNAPSHOT.jar rest-example.jar
+COPY rest-example-0.0.1-SNAPSHOT.jar rest-example.jar
 
 # CMD ["java", "-jar", "/rest-example.jar"]
 CMD ["rest-example.jar"]
