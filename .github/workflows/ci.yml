@@ -41,4 +41,4 @@ jobs:
       namespace: hest-er-best
       image_tag: eu.gcr.io/entur-system-1287/ci-cd-demo:v1.0.0
       environment: dev
-    needs: [ci-docker]
+    needs: [ci-app]
