@@ -10,7 +10,9 @@ class HelloWorldController {
 
     @GetMapping("/greet")
     @ResponseBody
-    fun sayHello(@RequestParam(name="name", required=false, defaultValue="World") name: String): Greeting {
-        return Greeting("Hello " + name)
+    fun sayHello(
+            @RequestParam(name = "name", required = false, defaultValue = "World") name: String
+    ): Greeting {
+        return Greeting("Yo " + name)
     }
 }

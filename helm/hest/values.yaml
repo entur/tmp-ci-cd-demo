@@ -1,18 +1,16 @@
 common:
-  app: getting-started
-  shortname: getstarted
+  app: hest-er-best
+  shortname: hest
   team: plattform
   ingress:
     trafficType: public
   container:
     cpu: "0.006"
     memory: 78
-    uid: 10100
     probes:
       liveness:
-        path: "/health/alive"
+        path: "/greet"
       readiness:
-        path: "/health/ready"
+        path: "/greet"
     prometheus:
-      enabled: true
-      path: "/metrics"
+      enabled: false

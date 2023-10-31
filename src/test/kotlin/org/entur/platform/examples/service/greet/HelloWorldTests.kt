@@ -10,25 +10,28 @@ import org.springframework.boot.web.server.LocalServerPort
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class HelloWorldTests {
 
-    @Autowired
-    lateinit var restTemplate: TestRestTemplate
+    @Autowired lateinit var restTemplate: TestRestTemplate
 
-    @LocalServerPort
-    var port: Int = 0
+    @LocalServerPort var port: Int = 0
 
     @Test
     fun `returns "Hello World" as default`() {
-        val responseEntity = restTemplate.getForEntity("http://localhost:" + port + "/greet", Map::class.java)
+        val responseEntity =
+                restTemplate.getForEntity("http://localhost:" + port + "/greet", Map::class.java)
         assertThat(responseEntity.statusCodeValue).isEqualTo(200)
-        assertThat(responseEntity.body!!["greeting"]).isEqualTo("Hello World")
+        assertThat(responseEntity.body!!["greeting"]).isEqualTo("Yo World")
     }
 
     @Test
     fun `returns name from query parameter when supplied`() {
         val name = "Jones"
-        val responseEntity = restTemplate.getForEntity("http://localhost:" + port + "/greet?name={name}", Map::class.java, name)
+        val responseEntity =
+                restTemplate.getForEntity(
+                        "http://localhost:" + port + "/greet?name={name}",
+                        Map::class.java,
+                        name
+                )
         assertThat(responseEntity.statusCodeValue).isEqualTo(200)
-        assertThat(responseEntity.body!!["greeting"]).isEqualTo("Hello " + name)
+        assertThat(responseEntity.body!!["greeting"]).isEqualTo("Yo " + name)
     }
-
 }
