@@ -33,3 +33,12 @@ jobs:
     with:
       app_name: ci-cd-demo
     needs: [ci-app]
+
+  helm-deploy:
+    uses: entur/tmp-github-actions-2/.github/workflows/helm-deploy.yml@master
+    with:
+      release_name: hest-er-best
+      namespace: hest-er-best
+      image_tag: eu.gcr.io/entur-system-1287/ci-cd-demo:v1.0.0
+      environment: dev
+    needs: [ci-docker]
