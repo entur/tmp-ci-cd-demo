@@ -11,35 +11,26 @@ on:
       - edited
 
 jobs:
-  # tf-plan:
-  #   name: Terraform plan
-  #   strategy:
-  #     fail-fast: false
-  #     matrix:
-  #       env: [dev, prd]
-  #   uses: entur/tmp-github-actions-2/.github/workflows/tf-plan.yml@master
-  #   with:
-  #     tf_version: 1.1.0
-  #     environment: ${{ matrix.env }}
-  #   secrets: inherit
-
-  # ci-app:
-  #   uses: entur/tmp-github-actions-2/.github/workflows/ci-gradle.yml@master
-  #   with:
-  #     java_version: '20'
-
-  # ci-docker:
-  #   uses: entur/tmp-github-actions-2/.github/workflows/ci-docker.yml@master
-  #   with:
-  #     app_name: ci-cd-demo
-  #   needs: [ci-app]
-
-  helm-deploy:
-    uses: entur/tmp-github-actions-2/.github/workflows/helm-deploy.yml@master
+  tf-plan:
+    name: Terraform plan
+    strategy:
+      fail-fast: false
+      matrix:
+        env: [dev, prd]
+    uses: entur/tmp-github-actions-2/.github/workflows/tf-plan.yml@master
     with:
-      release_name: hest-er-best
-      namespace: hest-er-best
-      image_tag: eu.gcr.io/entur-system-1287/ci-cd-demo:v1.0.0
-      environment: dev
-    # needs: [ci-docker]
+      tf_version: 1.1.0
+      environment: ${{ matrix.env }}
     secrets: inherit
+
+  ci-app:
+    uses: entur/tmp-github-actions-2/.github/workflows/ci-gradle.yml@master
+    with:
+      java_version: '20'
+
+  ci-docker:
+    uses: entur/tmp-github-actions-2/.github/workflows/ci-docker.yml@master
+    with:
+      app_name: ci-cd-demo
+    needs: [ci-app]
+
