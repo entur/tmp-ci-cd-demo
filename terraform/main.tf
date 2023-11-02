@@ -10,10 +10,10 @@ terraform {
 resource "random_pet" "name" {
   prefix = var.environment
   keepers = {
-    trigger = 2
+    trigger = 3
   }
 }
 
 output "pet_name" {
-  value = "Petterson ${random_pet.name}"
+  value = random_pet.name
 }
