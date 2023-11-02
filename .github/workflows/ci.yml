@@ -28,6 +28,16 @@ jobs:
     with:
       java_version: '20'
 
+  ci-insights:
+    strategy:
+      fail-fast: false
+      matrix:
+        env: [dev, prd]
+    uses: entur/tmp-github-actions-2/.github/workflows/ci-insight.yml@master
+    with:
+      environment: ${{ matrix.env }}
+    secrets: inherit
+
   ci-docker:
     uses: entur/tmp-github-actions-2/.github/workflows/ci-docker.yml@master
     with:
