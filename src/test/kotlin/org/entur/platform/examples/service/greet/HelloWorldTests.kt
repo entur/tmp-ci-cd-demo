@@ -19,7 +19,7 @@ class HelloWorldTests {
         val responseEntity =
                 restTemplate.getForEntity("http://localhost:" + port + "/greet", Map::class.java)
         assertThat(responseEntity.statusCodeValue).isEqualTo(200)
-        assertThat(responseEntity.body!!["greeting"]).isEqualTo("Yo World")
+        assertThat(responseEntity.body!!["greeting"]).isEqualTo("Hello World")
     }
 
     @Test
@@ -32,6 +32,6 @@ class HelloWorldTests {
                         name
                 )
         assertThat(responseEntity.statusCodeValue).isEqualTo(200)
-        assertThat(responseEntity.body!!["greeting"]).isEqualTo("Yo " + name)
+        assertThat(responseEntity.body!!["greeting"]).isEqualTo("Hello " + name)
     }
 }
