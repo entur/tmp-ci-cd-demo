@@ -27,20 +27,22 @@ jobs:
     uses: entur/tmp-github-actions-2/.github/workflows/ci-gradle.yml@master
     with:
       java_version: '20'
+      watch: src
 
   ci-insights:
     strategy:
       fail-fast: false
       matrix:
-        env: [dev, prd]
+        env: [prd]
     uses: entur/tmp-github-actions-2/.github/workflows/ci-insight.yml@master
     with:
       environment: ${{ matrix.env }}
     secrets: inherit
 
   ci-docker:
+    needs: [ci-app]
+    if: ${{ needs.ci-app.ci-gradle.outputs.build != '' }}
     uses: entur/tmp-github-actions-2/.github/workflows/ci-docker.yml@master
     with:
       app_name: ci-cd-demo
-    needs: [ci-app]
 
