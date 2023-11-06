@@ -48,3 +48,10 @@ jobs:
       app_name: ci-cd-demo
     needs: [ci-gradle]
 
+  cd-docker:
+    name: CD Docker
+    uses: entur/tmp-github-actions-2/.github/workflows/cd-docker.yml@master
+    with:
+      app_name: ci-cd-demo
+    needs: [ci-docker]
+
