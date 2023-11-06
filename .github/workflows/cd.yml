@@ -25,7 +25,6 @@ jobs:
     with:
       release_name: hest-er-best
       namespace: hest-er-best
-      image_tag: eu.gcr.io/entur-system-1287/ci-cd-demo:v1.0.0
       environment: dev
     needs: [tf-apply-dev]
     secrets: inherit
@@ -45,7 +44,6 @@ jobs:
     with:
       release_name: hest-er-best
       namespace: hest-er-best
-      image_tag: eu.gcr.io/entur-system-1287/ci-cd-demo:v1.0.0
       environment: prd
     needs: [tf-apply-prd]
     secrets: inherit
