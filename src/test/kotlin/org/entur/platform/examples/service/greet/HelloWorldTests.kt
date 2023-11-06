@@ -31,6 +31,7 @@ class HelloWorldTests {
                         Map::class.java,
                         name
                 )
+        // Just a comment, to get a new image - fun times!
         assertThat(responseEntity.statusCodeValue).isEqualTo(200)
         assertThat(responseEntity.body!!["greeting"]).isEqualTo("Sjallabais " + name)
     }
