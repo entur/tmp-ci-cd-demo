@@ -31,4 +31,5 @@ jobs:
       release_name: ${{ inputs.release_name }}
       namespace: hest-er-best
       environment: ${{ inputs.environment }}
+      image_tag: ${{ inputs.image_tag }}
     secrets: inherit
