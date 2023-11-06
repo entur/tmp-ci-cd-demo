@@ -9,6 +9,13 @@ on:
       - closed
 
 jobs:
+  cd-docker:
+    name: CD Docker
+    uses: entur/tmp-github-actions-2/.github/workflows/cd-docker.yml@master
+    with:
+      app_name: hest-er-best
+    secrets: inherit
+
   tf-apply-dev:
     name: Terraform apply dev
     uses: entur/tmp-github-actions-2/.github/workflows/tf-apply.yml@master

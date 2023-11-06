@@ -27,7 +27,7 @@ jobs:
     name: CI gradle
     uses: entur/tmp-github-actions-2/.github/workflows/ci-gradle.yml@master
     with:
-      app_name: ci-cd-demo
+      app_name: hest-er-best
       java_version: '20'
 
   ci-insights:
