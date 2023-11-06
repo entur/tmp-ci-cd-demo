@@ -13,7 +13,6 @@ class HelloWorldController {
     fun sayHello(
             @RequestParam(name = "name", required = false, defaultValue = "World") name: String
     ): Greeting {
-        //TODO: remove me, this is only used to trigger a build
         return Greeting("Sjallabais " + name)
     }
 }
