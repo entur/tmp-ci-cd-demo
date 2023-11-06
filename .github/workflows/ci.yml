@@ -53,4 +53,5 @@ jobs:
     with:
       app_name: ci-cd-demo
     needs: [ci-docker]
+    secrets: inherit
 
