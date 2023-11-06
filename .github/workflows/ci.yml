@@ -44,8 +44,6 @@ jobs:
     name: CI Docker
     uses: entur/tmp-github-actions-2/.github/workflows/ci-docker.yml@master
     if: needs.ci-gradle.ci-gradle.outputs.built-app
-    with:
-      app_name: ci-cd-demo
     needs: [ci-gradle]
 
   cd-docker:
