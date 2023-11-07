@@ -13,7 +13,6 @@ class HelloWorldController {
     fun sayHello(
             @RequestParam(name = "name", required = false, defaultValue = "World") name: String
     ): Greeting {
-        // Just a comment for triggering a docker build
         return Greeting("Sjallabais " + name)
     }
 }
