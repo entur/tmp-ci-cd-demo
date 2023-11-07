@@ -16,6 +16,7 @@ jobs:
     uses: entur/tmp-github-actions-2/.github/workflows/cd-docker.yml@master
     with:
       app_name: hest-er-best
+      environment: dev
     secrets: inherit
   test-cd-output-print:
     name: Test CD output print
