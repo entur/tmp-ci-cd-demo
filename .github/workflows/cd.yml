@@ -34,8 +34,8 @@ jobs:
       release_name: hest-er-best
       namespace: hest-er-best
       environment: dev
-      image_tag: ${{ jobs.cd-docker.outputs.image-id }} 
-    needs: [tf-apply-dev]
+      image_tag: ${{ needs.cd-docker.outputs.image-id }} 
+    needs: [cd-docker, tf-apply-dev]
     secrets: inherit
 
   tf-apply-prd:
@@ -54,6 +54,6 @@ jobs:
       release_name: hest-er-best
       namespace: hest-er-best
       environment: prd
-      image_tag: ${{ jobs.cd-docker.outputs.image-id }} 
-    needs: [tf-apply-prd]
+      image_tag: ${{ needs.cd-docker.outputs.image-id }} 
+    needs: [cd-docker, tf-apply-prd]
     secrets: inherit
