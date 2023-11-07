@@ -11,20 +11,6 @@ on:
       - edited
 
 jobs:
-  test-cd-output:
-    name: Test CD output
-    uses: entur/tmp-github-actions-2/.github/workflows/cd-docker.yml@master
-    with:
-      app_name: hest-er-best
-      environment: dev
-    secrets: inherit
-  test-cd-output-print:
-    name: Test CD output print
-    needs: test-cd-output
-    runs-on: ubuntu-latest
-    steps:
-      - id: echo
-        run: echo ${{ needs.test-cd-output.outputs.image-id }}
   tf-plan:
     name: Terraform plan
     strategy:
