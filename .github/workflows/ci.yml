@@ -23,6 +23,10 @@ jobs:
       environment: ${{ matrix.env }}
     secrets: inherit
 
+  ci-docker:
+    name: CI Docker
+    uses: entur/tmp-github-actions-2/.github/workflows/ci-docker.yml@master
+
   ci-gradle:
     name: CI gradle
     uses: entur/tmp-github-actions-2/.github/workflows/ci-gradle.yml@master
@@ -41,9 +45,4 @@ jobs:
       environment: ${{ matrix.env }}
     secrets: inherit
 
-  ci-docker:
-    name: CI Docker
-    uses: entur/tmp-github-actions-2/.github/workflows/ci-docker.yml@master
-    if: needs.ci-gradle.outputs.built-app
-    needs: [ci-gradle]
 
